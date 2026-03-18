@@ -21,15 +21,14 @@ class StickyBlogCTA extends HTMLElement {
           transition: all 0.3s ease;
         }
 
-        /* 👇 ACTIVE STICKY STATE */
+        /* ✅ STICKY ACTIVE */
         .sticky-blog-cta__content.fixed {
           position: fixed;
           top: 0;
-          left: 50%;
-          transform: translateX(-50%);
+          left: 0;
           width: 100%;
           z-index: 9999;
-          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .sticky-blog-cta__title {
@@ -53,10 +52,22 @@ class StickyBlogCTA extends HTMLElement {
           border-radius: 6px;
           background: linear-gradient(90deg, #6c3cff, #8e4dff);
         }
+
+        /* 👇 Prevent layout jump */
+        .sticky-blog-cta__placeholder {
+          display: none;
+          height: 0;
+        }
+
+        .sticky-blog-cta__placeholder.active {
+          display: block;
+        }
       </style>
 
       <div class="sticky-blog-cta">
         <div class="sticky-blog-cta__image"></div>
+
+        <div class="sticky-blog-cta__placeholder" id="placeholder"></div>
 
         <div class="sticky-blog-cta__content" id="ctaContent">
           <h2 class="sticky-blog-cta__title">
@@ -77,25 +88,31 @@ class StickyBlogCTA extends HTMLElement {
     `;
 
     const cta = this.querySelector('#ctaContent');
+    const placeholder = this.querySelector('#placeholder');
 
-    // Wait for layout to stabilize
+    // Wait for Wix layout to stabilize
     setTimeout(() => {
       const triggerPoint = this.getBoundingClientRect().top + window.scrollY;
+      const ctaHeight = cta.offsetHeight;
+
+      placeholder.style.height = ctaHeight + 'px';
 
       window.addEventListener('scroll', () => {
         if (window.scrollY >= triggerPoint) {
           cta.classList.add('fixed');
+          placeholder.classList.add('active');
         } else {
           cta.classList.remove('fixed');
+          placeholder.classList.remove('active');
         }
       });
-    }, 300);
+    }, 500);
 
-    // CTA click
+    // Button click
     this.querySelector('#ctaBtn').addEventListener('click', () => {
       window.open('https://calendly.com/punit-ecomm/consulting', '_blank');
 
-      // GA tracking
+      // Google Analytics tracking
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'sticky_blog_cta_click', {
           event_category: 'Sticky Blog CTA',
