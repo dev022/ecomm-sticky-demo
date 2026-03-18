@@ -21,7 +21,7 @@ class StickyBlogCTA extends HTMLElement {
           transition: all 0.3s ease;
         }
 
-        /* ✅ STICKY ACTIVE */
+        /* ✅ STICKY STATE */
         .sticky-blog-cta__content.fixed {
           position: fixed;
           top: 0;
@@ -53,21 +53,19 @@ class StickyBlogCTA extends HTMLElement {
           background: linear-gradient(90deg, #6c3cff, #8e4dff);
         }
 
-        /* 👇 Prevent layout jump */
-        .sticky-blog-cta__placeholder {
+        .placeholder {
           display: none;
-          height: 0;
         }
 
-        .sticky-blog-cta__placeholder.active {
+        .placeholder.active {
           display: block;
         }
       </style>
 
-      <div class="sticky-blog-cta">
+      <div class="sticky-blog-cta" id="wrapper">
         <div class="sticky-blog-cta__image"></div>
 
-        <div class="sticky-blog-cta__placeholder" id="placeholder"></div>
+        <div class="placeholder" id="placeholder"></div>
 
         <div class="sticky-blog-cta__content" id="ctaContent">
           <h2 class="sticky-blog-cta__title">
@@ -87,32 +85,38 @@ class StickyBlogCTA extends HTMLElement {
       </div>
     `;
 
+    const wrapper = this.querySelector('#wrapper');
     const cta = this.querySelector('#ctaContent');
     const placeholder = this.querySelector('#placeholder');
 
-    // Wait for Wix layout to stabilize
+    // Set placeholder height
     setTimeout(() => {
-      const triggerPoint = this.getBoundingClientRect().top + window.scrollY;
-      const ctaHeight = cta.offsetHeight;
+      placeholder.style.height = cta.offsetHeight + 'px';
+    }, 300);
 
-      placeholder.style.height = ctaHeight + 'px';
+    // ✅ SCROLL DETECTION (robust)
+    const onScroll = () => {
+      const rect = wrapper.getBoundingClientRect();
+      console.log(rect.top);
+      if (rect.top <= 0) {
+        cta.classList.add('fixed');
+        placeholder.classList.add('active');
+      } else {
+        cta.classList.remove('fixed');
+        placeholder.classList.remove('active');
+      }
+    };
 
-      window.addEventListener('scroll', () => {
-        if (window.scrollY >= triggerPoint) {
-          cta.classList.add('fixed');
-          placeholder.classList.add('active');
-        } else {
-          cta.classList.remove('fixed');
-          placeholder.classList.remove('active');
-        }
-      });
-    }, 500);
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
+
+    // Trigger once
+    onScroll();
 
     // Button click
     this.querySelector('#ctaBtn').addEventListener('click', () => {
       window.open('https://calendly.com/punit-ecomm/consulting', '_blank');
 
-      // Google Analytics tracking
       if (typeof window.gtag === 'function') {
         window.gtag('event', 'sticky_blog_cta_click', {
           event_category: 'Sticky Blog CTA',
