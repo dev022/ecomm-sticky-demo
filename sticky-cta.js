@@ -1,86 +1,98 @@
 class StickyBlogCTA extends HTMLElement {
-  constructor() {
-    super();
-  }
-
   connectedCallback() {
     this.innerHTML = `
       <style>
-        .sticky-blog-cta {
+        .cta-wrapper {
           width: 100%;
         }
 
-        .sticky-blog-cta__image {
+        .cta-image {
           height: 280px;
           background-image: url('https://images.unsplash.com/photo-1581092918056-0c4c3acd3789');
           background-size: cover;
           background-position: center;
         }
 
-        .sticky-blog-cta__content {
-          position: sticky;
-          top: 0;
-          z-index: 999;
-
+        .cta-content {
+          position: relative;
           background: #f5f5f7;
           padding: 40px 20px;
-          box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+          transition: all 0.3s ease;
         }
 
-        .sticky-blog-cta__title {
+        .cta-content.fixed {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          z-index: 9999;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .cta-title {
           color: #6c3cff;
-          font-size: 30px;
+          font-size: 28px;
           margin-bottom: 20px;
         }
 
-        .sticky-blog-cta__point {
-          margin-bottom: 12px;
-          font-size: 16px;
+        .cta-point {
+          margin-bottom: 10px;
         }
 
-        .sticky-blog-cta__button {
+        .cta-btn {
           width: 100%;
-          padding: 16px;
-          font-size: 18px;
+          padding: 14px;
+          background: linear-gradient(90deg, #6c3cff, #8e4dff);
           color: #fff;
           border: none;
           cursor: pointer;
           border-radius: 6px;
-          background: linear-gradient(90deg, #6c3cff, #8e4dff);
         }
       </style>
 
-      <div class="sticky-blog-cta">
-        <div class="sticky-blog-cta__image"></div>
+      <div class="cta-wrapper">
+        <div class="cta-image"></div>
 
-        <div class="sticky-blog-cta__content">
-          <h2 class="sticky-blog-cta__title">
+        <div class="cta-content" id="ctaBox">
+          <h2 class="cta-title">
             Ready to transform your Ecommerce business?
           </h2>
 
           <div>
-            <div class="sticky-blog-cta__point">Not tech, but business & customer first approach</div>
-            <div class="sticky-blog-cta__point">AI-Skilled & Agile</div>
-            <div class="sticky-blog-cta__point">Transparent, Trustworthy & Vetted team</div>
+            <div class="cta-point">Not tech, but business & customer first approach</div>
+            <div class="cta-point">AI-Skilled & Agile</div>
+            <div class="cta-point">Transparent, Trustworthy & Vetted team</div>
           </div>
 
-          <button class="sticky-blog-cta__button" id="ctaBtn">
+          <button class="cta-btn" id="ctaBtn">
             Book your FREE consultation
           </button>
         </div>
       </div>
     `;
 
+    const cta = this.querySelector('#ctaBox');
+    const offsetTop = this.offsetTop;
+
+    // Scroll logic INSIDE element (no Wix Velo needed)
+    window.addEventListener('scroll', () => {
+      if (window.scrollY >= offsetTop) {
+        cta.classList.add('fixed');
+      } else {
+        cta.classList.remove('fixed');
+      }
+    });
+
+    // Button click
     this.querySelector('#ctaBtn').addEventListener('click', () => {
       window.open('https://calendly.com/punit-ecomm/consulting', '_blank');
 
-      // GA tracking
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'sticky_blog_cta_click', {
-          event_category: 'Sticky Blog CTA',
-          event_label: 'Consultation Button'
-        });
-      }
+      // if (typeof window.gtag === 'function') {
+      //   window.gtag('event', 'sticky_blog_cta_click', {
+      //     event_category: 'Sticky Blog CTA',
+      //     event_label: 'Consultation Button'
+      //   });
+      // }
     });
   }
 }
