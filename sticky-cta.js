@@ -2,9 +2,17 @@ class StickyBlogCTA extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <style>
+        :host {
+          display: block;
+        }
+
+        /* ✅ WHOLE CTA STICKY */
         .sticky-blog-cta {
+          position: sticky;
+          top: 0;
+          z-index: 999;
+
           width: 100%;
-          position: relative;
         }
 
         .sticky-blog-cta__image {
@@ -15,20 +23,9 @@ class StickyBlogCTA extends HTMLElement {
         }
 
         .sticky-blog-cta__content {
-          position: relative;
           background: #f5f5f7;
           padding: 40px 20px;
-          transition: all 0.3s ease;
-        }
-
-        /* ✅ STICKY STATE */
-        .sticky-blog-cta__content.fixed {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          z-index: 9999;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
         .sticky-blog-cta__title {
@@ -52,22 +49,12 @@ class StickyBlogCTA extends HTMLElement {
           border-radius: 6px;
           background: linear-gradient(90deg, #6c3cff, #8e4dff);
         }
-
-        .placeholder {
-          display: none;
-        }
-
-        .placeholder.active {
-          display: block;
-        }
       </style>
 
-      <div class="sticky-blog-cta" id="wrapper">
+      <div class="sticky-blog-cta">
         <div class="sticky-blog-cta__image"></div>
 
-        <div class="placeholder" id="placeholder"></div>
-
-        <div class="sticky-blog-cta__content" id="ctaContent">
+        <div class="sticky-blog-cta__content">
           <h2 class="sticky-blog-cta__title">
             Ready to transform your Ecommerce business?
           </h2>
@@ -78,52 +65,13 @@ class StickyBlogCTA extends HTMLElement {
             <div class="sticky-blog-cta__point">Transparent, Trustworthy & Vetted team</div>
           </div>
 
-          <button class="sticky-blog-cta__button" id="ctaBtn">
+          <button class="sticky-blog-cta__button"
+            onclick="window.open('https://calendly.com/punit-ecomm/consulting','_blank')">
             Book your FREE consultation
           </button>
         </div>
       </div>
     `;
-
-    const wrapper = this.querySelector('#wrapper');
-    const cta = this.querySelector('#ctaContent');
-    const placeholder = this.querySelector('#placeholder');
-
-    // Set placeholder height
-    setTimeout(() => {
-      placeholder.style.height = cta.offsetHeight + 'px';
-    }, 300);
-
-    // ✅ SCROLL DETECTION (robust)
-    const onScroll = () => {
-      const rect = wrapper.getBoundingClientRect();
-      console.log(rect.top);
-      if (rect.top <= 0) {
-        cta.classList.add('fixed');
-        placeholder.classList.add('active');
-      } else {
-        cta.classList.remove('fixed');
-        placeholder.classList.remove('active');
-      }
-    };
-
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('resize', onScroll);
-
-    // Trigger once
-    onScroll();
-
-    // Button click
-    this.querySelector('#ctaBtn').addEventListener('click', () => {
-      window.open('https://calendly.com/punit-ecomm/consulting', '_blank');
-
-      if (typeof window.gtag === 'function') {
-        window.gtag('event', 'sticky_blog_cta_click', {
-          event_category: 'Sticky Blog CTA',
-          event_label: 'Consultation Button'
-        });
-      }
-    });
   }
 }
 
